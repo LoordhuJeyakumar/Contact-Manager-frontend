@@ -1,9 +1,11 @@
-import React, {useState} from 'react';
+import PropsType from "prop-types";
+
+import { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { deleteContact,updateContact } from '../redux/slices/contactSlice';
-import Swal from 'sweetalert2';
+import { deleteContact, updateContact } from "../redux/slices/contactSlice";
+import Swal from "sweetalert2";
 
 const ContactBox = ({ contact }) => {
   const dispatch = useDispatch();
@@ -17,14 +19,17 @@ const ContactBox = ({ contact }) => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
+      confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/user/contacts/delete/${id}`, {
-            method: "DELETE",
-            credentials: 'include'
-          });
+          const res = await fetch(
+            `${import.meta.env.VITE_SERVER_URL}/api/user/contacts/delete/${id}`,
+            {
+              method: "DELETE",
+              credentials: "include",
+            }
+          );
           const data = await res.json();
           if (data.success) {
             dispatch(deleteContact(id));
@@ -41,7 +46,6 @@ const ContactBox = ({ contact }) => {
   };
 
   const handleUpdate = () => {
-    // Same SweetAlert2 confirmation dialog
     Swal.fire({
       title: "Update Contact",
       html: `
@@ -55,29 +59,33 @@ const ContactBox = ({ contact }) => {
       cancelButtonText: "Cancel",
       focusConfirm: false,
       preConfirm: () => {
-        // Update editedContact state with new values
         setEditedContact({
           ...editedContact,
-          name: document.getElementById('name').value,
-          email: document.getElementById('email').value,
-          phone: document.getElementById('phone').value,
-          address: document.getElementById('address').value,
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          phone: document.getElementById("phone").value,
+          address: document.getElementById("address").value,
         });
-      }
+      },
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/user/contacts/update/${editedContact._id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            credentials: 'include',
-            body: JSON.stringify(editedContact)
-          });
+          const res = await fetch(
+            `${import.meta.env.VITE_SERVER_URL}/api/user/contacts/update/${
+              editedContact._id
+            }`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify(editedContact),
+            }
+          );
           const data = await res.json();
           if (data.success) {
-            dispatch(updateContact(editedContact)); 
+            dispatch(updateContact(editedContact));
             toast.success(data.message);
           } else {
             toast.error(data.message);
@@ -91,9 +99,9 @@ const ContactBox = ({ contact }) => {
   };
 
   return (
-    <div className="p-4 lg:w-1/2 w-full">
-      <div className="flex shadow rounded-lg bg-gray-200 p-8 sm:flex-row flex-col cursor-pointer hover:bg-gray-300">
-        <div className="w-16 h-16 sm:mr-8 sm:mb-0 mb-4 inline-flex items-center justify-center rounded-full bg-white text-indigo-500 flex-shrink-0 ">
+    <div className="p-4  transform hover:scale-105 transition-all ease-in-out duration-300 w-full">
+      <div className="flex shadow-lg rounded-xl bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 p-8 sm:flex-row flex-col cursor-pointer hover:scale-105 hover:shadow-2xl transition-transform duration-300">
+        <div className="w-16 h-16 sm:mr-8 sm:mb-0 mb-4 inline-flex items-center justify-center rounded-full bg-white text-indigo-500 flex-shrink-0 transform hover:rotate-12 transition-transform duration-500">
           <svg
             fill="none"
             stroke="currentColor"
@@ -107,27 +115,39 @@ const ContactBox = ({ contact }) => {
             <circle cx={12} cy={7} r={4} />
           </svg>
         </div>
-        <div className="flex-grow">
-          <h2 className="text-gray-900 text-xl font-medium mb-3">
+        <div className="flex-grow ">
+          <h2 className="text-white text-xl font-semibold mb-3">
             Name: {contact.name}
           </h2>
-          <h2 className="text-lg  mb-3">
-            Email: {contact.email}
-          </h2>
-          <h2 className="text-lg  mb-3">
+          <h2 className="text-white text-lg mb-3">Email: {contact.email}</h2>
+          <h2 className="text-white text-lg mb-3">
             Phone number: {contact.phone}
           </h2>
-          <p className='mb-5'>
-            Address: {contact.address}
-          </p>
-          <div className='flex gap-4 justify-between'>
-            <FaTrash color='red' size={20} onClick={() => handleDelete(contact._id)} />
-            <FaEdit color='green' size={25} onClick={() => handleUpdate(contact._id)} />
+          <p className="text-white mb-5">Address: {contact.address}</p>
+          <div className="flex gap-6 justify-start">
+            <FaTrash
+              color="red"
+              size={25}
+              className="transform hover:scale-110 transition-transform duration-200"
+              onClick={() => handleDelete(contact._id)}
+            />
+            <FaEdit
+              color="green"
+              size={30}
+              className="transform hover:scale-110 transition-transform duration-200"
+              onClick={handleUpdate}
+            />
           </div>
         </div>
       </div>
     </div>
   );
+};
+
+ContactBox.propTypes = {
+  contact: PropsType.object,
+  onDelete: PropsType.func,
+  onUpdate: PropsType.func,
 };
 
 export default ContactBox;
